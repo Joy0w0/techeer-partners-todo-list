@@ -9,7 +9,7 @@
 ## 기본 요구 사항
 
 1. [Figma 디자인](https://www.figma.com/design/GoXOrkZRu1Lznw37pjWDHw/Techeer-Partners-5%EA%B8%B0-%ED%94%84%EB%A1%A0%ED%8A%B8%EC%97%94%EB%93%9C-API-%EC%97%B0%EB%8F%99-%EC%8B%A4%EC%8A%B5-%EA%B3%BC%EC%A0%9C?node-id=0-1&t=vQObqjzePvNdFsu4-1)을 참고하여 퍼블리싱
-2. [API 명세서](https://melodic-walleye-2ab.notion.site/TodoList-API-1385051bdea58043bd8bd272376db7f8)를 참고하여 CRUD API 연동하기 (할일 생성, 조회, 수정, 삭제)
+2. Docker 세팅 후(아래 내용 참고) [API 명세서](https://melodic-walleye-2ab.notion.site/TodoList-API-1385051bdea58043bd8bd272376db7f8)를 참고하여 CRUD API 연동하기 (할일 생성, 조회, 수정, 삭제)
 
 ## Challenge (추가 도전 과제)</p>
 
