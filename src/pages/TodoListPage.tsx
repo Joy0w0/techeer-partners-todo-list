@@ -10,7 +10,7 @@ export default function TodoListPage() {
       <div className="relative flex w-screen h-screen justify-center items-center ">
         <ListContainer>
           <Wrapper>
-            <title className="flex justify-center font-bold text-4xl pt-[3.5rem] pb-[2rem]">
+            <title className="flex justify-center font-bold text-4xl pt-[3.5rem] pb-[2rem] text-white/90">
               TOdo List
             </title>
             <TodoInput />
