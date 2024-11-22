@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import plus from "../assets/images/plus.png";
 import completed from "../assets/images/completed.png";
@@ -9,33 +9,52 @@ import trashdone from "../assets/images/trashdone.png";
 export default function TodoInput() {
   const [tasks, setTasks] = useState([]);
   const [newTask, setNewTask] = useState("");
+  const inputRef = useRef(null); // input 요소를 참조할 useRef 생성
 
+  useEffect(() => {
+    if (inputRef.current) {
+      inputRef.current.focus(); // input 요소에 커서 위치
+    }
+  }, []);
   // 할 일 추가
   const handleAddTask = () => {
     if (!newTask) return;
-
+  
     axios
       .post("http://localhost:8080/tasks", { title: newTask })
+      .then(() => {
+        return axios.get("http://localhost:8080/tasks"); // 전체 작업 목록 다시 요청
+      })
       .then((response) => {
-        window.location.reload();
-        const addedTask = response.data; // 서버에서 반환된 새로운 할 일
-        setTasks([...tasks, { ...addedTask, isCompleted: addedTask.done }]); // done을 isCompleted로 변환
-        setNewTask(""); // 입력 필드 초기화
+        setTasks(
+          response.data.map((task) => ({ ...task, isCompleted: task.done }))
+        );
+        setNewTask("");
+        if (inputRef.current) {
+          inputRef.current.focus();
+        }
       })
       .catch((error) => console.error("Error adding task:", error));
   };
 
   // 할 일 토글
   const handleToggle = (id) => {
+    // 현재 상태에서 토글하려는 task 찾기
+    const currentTask = tasks.find((task) => task.id === id);
+  
+    if (!currentTask) return; // task가 없으면 종료
+  
+    // 현재 done 값을 반대로 보내도록 요청
     axios
-      .patch(`http://localhost:8080/tasks/${id}/complete`)
+      .patch(`http://localhost:8080/tasks/${id}/complete`, {
+        done: !currentTask.isCompleted,
+      })
+      .then(() => {
+        return axios.get("http://localhost:8080/tasks"); // 전체 작업 목록 다시 요청
+      })
       .then((response) => {
-        window.location.reload();
-        const updatedTask = response.data; // 서버에서 변경된 할 일
         setTasks(
-          tasks.map((task) =>
-            task.id === id ? { ...task, isCompleted: updatedTask.done } : task // done을 isCompleted로 반영
-          )
+          response.data.map((task) => ({ ...task, isCompleted: task.done })) // 서버 데이터로 상태 업데이트
         );
       })
       .catch((error) => console.error("Error toggling task:", error));
@@ -83,6 +102,7 @@ export default function TodoInput() {
     <div className="flex flex-col w-[29rem] h-full overflow-y-hidden overflow-x-hidden">
       <div className="flex flex-row justify-center">
         <input
+          ref={inputRef} // input 요소와 ref 연결
           value={newTask}
           onChange={(e) => setNewTask(e.target.value)}
           className="flex w-[29rem] h-[2.75rem] bg-white/15 text-[#d9d9d9] hover:bg-white/20 border border-[1px] border-solid border-[#d9d9d9] rounded-[0.3rem] p-[0.94rem] mr-[0.5rem] outline-none focus:placeholder-transparent placeholder-[#d9d9d9]"
