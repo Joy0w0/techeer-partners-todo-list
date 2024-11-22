@@ -23,7 +23,7 @@ export default function TodoInput() {
     axios
       .post("http://localhost:8080/tasks", { title: newTask })
       .then(() => {
-        return axios.get("http://localhost:8080/tasks"); // 전체 작업 목록 다시 요청
+        return axios.get("http://localhost:8080/tasks"); // 전체 작업 목록 다시 요청/////응답이 message만 와서 다시 요청 안하면 바로 안 뜨는듯
       })
       .then((response) => {
         setTasks(
@@ -44,7 +44,7 @@ export default function TodoInput() {
   
     if (!currentTask) return; // task가 없으면 종료
   
-    // 현재 done 값을 반대로 보내도록 요청
+    // 현재 done 값을 반대로 보내도록 요청-->근데 done을 true로 바꾸면 다시 false로 바꾸는 로직 없어서 토글형식 구현 불가
     axios
       .patch(`http://localhost:8080/tasks/${id}/complete`, {
         done: !currentTask.isCompleted,
@@ -89,7 +89,7 @@ export default function TodoInput() {
       .then((response) => {
         if (Array.isArray(response.data)) {
           setTasks(
-            response.data.map((task) => ({ ...task, isCompleted: task.done })) // done을 isCompleted로 변환
+            response.data.map((task) => ({ ...task, isCompleted: task.done })) // done을 isCompleted로 변환->
           );
         } else {
           console.error("Unexpected response data:", response.data);
