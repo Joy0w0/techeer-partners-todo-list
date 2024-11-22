@@ -9,45 +9,73 @@ function TodoList() {
   const [todo, setTodo] = useState('');
   const [todoList, setTodoList] = useState([]);
 
-  // 로컬스토리지에서 할 일 목록 가져오기
+  const API_BASE_URL = 'http://localhost:8080'; // API URL
+
+  // 할 일 목록 가져오기 (초기화 시 호출)
   useEffect(() => {
-    const savedTodos = JSON.parse(localStorage.getItem('todoList')) || [];
-    setTodoList(savedTodos);
+    fetchIncompleteTasks();
   }, []);
 
-  // 할 일 목록을 로컬스토리지에 저장
-  const saveTodosToLocalStorage = (todos) => {
-    localStorage.setItem('todoList', JSON.stringify(todos));
+  // 미완료 일 조회
+  const fetchIncompleteTasks = async () => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/tasks/incomplete`);
+      if (!response.ok) throw new Error('Failed to fetch incomplete tasks');
+
+      const data = await response.json();
+      setTodoList(data.data || []);
+    } catch (error) {
+      console.error('Error fetching incomplete tasks:', error);
+    }
   };
 
   // 할 일 추가
-  const handleAddTodo = () => {
+  const handleAddTodo = async () => {
     if (todo.trim()) {
-      const newTodo = { id: Date.now(), title: todo, isDone: false };
-      const updatedTodoList = [...todoList, newTodo];
-      setTodoList(updatedTodoList);
-      saveTodosToLocalStorage(updatedTodoList);
-      setTodo('');
-      console.log('할 일이 추가되었습니다!');
+      try {
+        const response = await fetch(`${API_BASE_URL}/tasks`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ title: todo, isDone: false }),
+        });
+        if (!response.ok) throw new Error('Failed to add task');
+
+        setTodo('');
+        fetchIncompleteTasks(); // 추가 후 목록 새로고침
+      } catch (error) {
+        console.error('Error adding todo:', error);
+      }
     }
   };
 
   // 할 일 수정
-  const handleUpdateTodo = (id, updatedTitle, isDone) => {
-    const updatedTodoList = todoList.map((item) =>
-      item.id === id ? { ...item, title: updatedTitle, isDone } : item,
-    );
-    setTodoList(updatedTodoList);
-    saveTodosToLocalStorage(updatedTodoList);
-    console.log('할 일 리스트가 수정되었습니다');
+  const handleUpdateTodo = async (id, title, isDone) => {
+    console.log('Updating Todo:', id, title, isDone); // 디버깅용 콘솔 로그
+    try {
+      const response = await fetch(`${API_BASE_URL}/tasks/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ title, isDone }), // 여기서 title과 isDone을 바로 사용
+      });
+      if (!response.ok) throw new Error('Failed to update task');
+      fetchIncompleteTasks(); // 수정 후 목록 새로고침
+    } catch (error) {
+      console.error('Error updating todo:', error);
+    }
   };
 
   // 할 일 삭제
-  const handleDeleteTodo = (id) => {
-    const updatedTodoList = todoList.filter((item) => item.id !== id);
-    setTodoList(updatedTodoList);
-    saveTodosToLocalStorage(updatedTodoList);
-    console.log('할 일이 삭제되었습니다');
+  const handleDeleteTodo = async (id) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/tasks/${id}`, {
+        method: 'DELETE',
+      });
+      if (!response.ok) throw new Error('Failed to delete task');
+
+      fetchIncompleteTasks(); // 삭제 후 목록 새로고침
+    } catch (error) {
+      console.error('Error deleting todo:', error);
+    }
   };
 
   return (
