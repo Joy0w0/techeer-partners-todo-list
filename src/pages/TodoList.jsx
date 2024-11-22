@@ -49,15 +49,15 @@ function TodoList() {
   };
 
   // 할 일 수정
-  const handleUpdateTodo = async (id, title, isDone) => {
-    console.log('Updating Todo:', id, title, isDone); // 디버깅용 콘솔 로그
+  const handleUpdateTodo = async (id, updatedTitle, isDone) => {
     try {
       const response = await fetch(`${API_BASE_URL}/tasks/${id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ title, isDone }), // 여기서 title과 isDone을 바로 사용
+        body: JSON.stringify({ title: updatedTitle, isDone }),
       });
       if (!response.ok) throw new Error('Failed to update task');
+
       fetchIncompleteTasks(); // 수정 후 목록 새로고침
     } catch (error) {
       console.error('Error updating todo:', error);
